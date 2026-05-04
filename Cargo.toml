@@ -1,0 +1,15 @@
+[package]
+name = "kontracts-grpc"
+version = "0.1.0"
+edition = "2024"
+description = "Komrad — gRPC contract definitions (generated Rust types)"
+license = "AGPL-3.0-or-later"
+
+[dependencies]
+tonic = "0.14.5"
+tonic-prost = "0.14.5"
+prost = "0.14"
+tokio = { version = "1.0", features = ["macros", "rt-multi-thread"] }
+
+[build-dependencies]
+tonic-prost-build = "0.14.5"
