@@ -10,8 +10,42 @@ on:
 jobs:
   security:
     uses: komrad-company/Kontinuous-integration/.github/workflows/security-pipeline.yml@main
-  pipeline:
+
+  test:
+    needs: security
+    runs-on:
+      labels: komrad-runners
+    container:
+      image: rust:latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: komrad-company/Kontinuous-integration/.github/actions/proto/setup@main
+      - uses: komrad-company/Kontinuous-integration/.github/actions/rust/tests@main
+
+  lint:
+    needs: security
+    runs-on:
+      labels: komrad-runners
+    container:
+      image: rust:latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: komrad-company/Kontinuous-integration/.github/actions/proto/setup@main
+      - uses: komrad-company/Kontinuous-integration/.github/actions/rust/fmt@main
+        with:
+          continue-on-error: false
+      - uses: komrad-company/Kontinuous-integration/.github/actions/rust/clippy@main
+
+  release:
+    needs: [lint, test]
+    if: ${{ github.ref_type == 'tag' }}
     permissions:
       contents: write
-    needs: security
-    uses: komrad-company/Kontinuous-integration/.github/workflows/rust-pipeline.yml@main
+    runs-on:
+      labels: komrad-runners
+    container:
+      image: rust:latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: komrad-company/Kontinuous-integration/.github/actions/proto/setup@main
+      - uses: komrad-company/Kontinuous-integration/.github/actions/rust/release@main
