@@ -3,40 +3,47 @@ package kolektor.v1;
 option deprecated = false;
 
 service KolektorConfigService {
-    rpc AddParser(AddParserRequest) returns (AddParserResponse);
-    rpc RemoveParser(RemoveParserRequest) returns (RemoveParserResponse);
-    rpc GetMetrics(GetMetricsRequest) returns (GetMetricsResponse);
+    rpc GetCatalog(GetCatalogRequest) returns (GetCatalogResponse);
+    rpc AddParser(AddParserRequest) returns (ParserApplyResponse);
+    rpc RemoveParser(RemoveParserRequest) returns (ParserApplyResponse);
+    rpc ListActiveParsers(ListActiveParsersRequest) returns (ListActiveParsersResponse);
     rpc GetStatus(GetStatusRequest) returns (GetStatusResponse);
+}
+
+message GetCatalogRequest {}
+
+message CatalogParser {
+    string source_type = 1;
+    string display_name = 2;
+    string category = 3;
+    optional int32 default_port = 4;
+    optional string ocsf_index = 5;
+    optional string description = 6;
+}
+
+message GetCatalogResponse {
+    repeated CatalogParser parsers = 1;
 }
 
 message AddParserRequest {
     string source_type = 1;
 }
 
-message AddParserResponse {
-    string source_type = 1;
-    bool enabled = 2;
-    int32 version = 3;
-}
-
 message RemoveParserRequest {
     string source_type = 1;
 }
 
-message RemoveParserResponse {
+message ParserApplyResponse {
     string source_type = 1;
-    bool enabled = 2;
-    int32 version = 3;
+    bool active = 2;
+    int64 config_written_unix_ms = 3;
 }
 
-message GetMetricsRequest {}
+message ListActiveParsersRequest {}
 
-message GetMetricsResponse {
-    int64 parsers_total    = 1;
-    int64 parsers_enabled  = 2;
-    int64 fetchers_total   = 3;
-    int64 fetchers_enabled = 4;
-    optional int64 last_reload_unix_ms = 5;
+message ListActiveParsersResponse {
+    repeated string source_types = 1;
+    optional int64 config_written_unix_ms = 2;
 }
 
 message GetStatusRequest {}
